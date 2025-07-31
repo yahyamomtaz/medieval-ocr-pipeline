@@ -7,19 +7,6 @@
 
 This repository contains the implementation of a complete OCR text correction pipeline specifically designed for medieval manuscripts. The system combines **Kraken** for line segmentation, **TrOCR** for initial text recognition, and a fine-tuned **ByT5** model for OCR error correction.
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Pipeline Architecture](#pipeline-architecture)
-- [Dataset](#dataset)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Training](#training)
-- [Evaluation](#evaluation)
-- [Results](#results)
-- [Citation](#citation)
-- [License](#license)
-
 ## 🔍 Overview
 
 Medieval manuscripts present unique challenges for OCR systems due to:
@@ -33,30 +20,70 @@ Our solution addresses these challenges through a multi-stage pipeline that achi
 ## 🏗️ Pipeline Architecture
 
 ```mermaid
-graph TD
-    A[📄 Medieval Manuscript Image] --> B[🔍 Kraken Line Segmentation]
-    B --> C[📝 Individual Line Images]
-    C --> D[🤖 TrOCR Medieval Model]
-    D --> E[📝 Raw OCR Text]
-    E --> F[✨ Fine-tuned ByT5 Correction]
-    F --> G[📖 Corrected Text Output]
+graph TB
+    subgraph FT ["🎓 Fine-Tuning Phase"]
+        A[📝 Raw OCR Line]
+        F[✅ Verified Ground<br/>Truth Line]
+        B[🔧 Manual Alignment]
+        C[📋 Aligned Line Pairs]
+        D[🤖 ByT5 Fine-Tuning]
+        M[💾 Trained ByT5<br/>Correction Model]
+        
+        A --> B
+        F --> B
+        B --> C
+        C --> D
+        D --> M
+    end
     
-    H[📚 Training Dataset] --> I[🔧 ByT5 Fine-tuning]
-    I --> J[💾 Correction Model]
-    J --> F
+    subgraph IP ["🚀 Inference Pipeline"]
+        IMG[📄 New Manuscript<br/>Image]
+        SEG[🔍 Kraken Line<br/>Segmentation]
+        LINES[📝 Line Images]
+        OCR[🤖 TrOCR Medieval<br/>Model]
+        NOISY[📝 Raw OCR Output]
+        CORR[✨ ByT5 Correction]
+        FINAL[📖 Corrected<br/>Output]
+        
+        IMG --> SEG
+        SEG --> LINES
+        LINES --> OCR
+        OCR --> NOISY
+        NOISY --> CORR
+        CORR --> FINAL
+    end
     
-    style A fill:#e1f5fe
-    style G fill:#e8f5e8
-    style F fill:#fff3e0
-    style I fill:#fce4ec
+    M -.-> CORR
+    
+    style A fill:#bbdefb,color:#000
+    style F fill:#c8e6c9,color:#000
+    style B fill:#fff59d,color:#000
+    style C fill:#ffcc80,color:#000
+    style D fill:#f8bbd9,color:#000
+    style M fill:#a5d6a7,color:#000
+    style IMG fill:#90caf9,color:#000
+    style SEG fill:#81d4fa,color:#000
+    style LINES fill:#e0e0e0,color:#000
+    style OCR fill:#ffab91,color:#000
+    style NOISY fill:#e0e0e0,color:#000
+    style CORR fill:#ffcc80,color:#000
+    style FINAL fill:#a5d6a7,color:#000
 ```
 
 ### Process Flow
 
+#### Fine-Tuning Phase
+1. **Data Preparation**: Raw OCR lines and verified ground truth texts are collected
+2. **Manual Alignment**: OCR outputs are aligned with their corresponding ground truth
+3. **Dataset Creation**: Aligned line pairs form the training dataset
+4. **Model Training**: ByT5 model is fine-tuned on medieval OCR correction patterns
+
+#### Inference Pipeline
 1. **Line Segmentation**: Kraken automatically detects and segments text lines
 2. **Initial OCR**: TrOCR processes each line with medieval-optimized model
 3. **Error Correction**: Fine-tuned ByT5 model corrects OCR errors
 4. **Text Assembly**: Individual corrected lines are combined into final output
+
 
 ## 📊 Dataset
 
@@ -76,6 +103,8 @@ Our dataset consists of **10,643 text line pairs** extracted from medieval manus
 - **Average line length**: ~45 characters
 - **Character Error Rate** (before correction): ~12.3%
 - **Training/Validation/Test split**: 80%/10%/10%
+
+The early printed books used for OCR and post-correction tasks originate from the [MAGIC digital archive](https://www.magic.unina.it), which provides open access to digitized manuscripts. Our training data was created by aligning OCR outputs with manually verified transcriptions based on these sources.
 
 ## 🚀 Installation
 
@@ -155,8 +184,8 @@ Train the correction model:
 
 ```bash
 python Byt5_finetune.py \
-    --dataset_path dataset/dataset_abbreviation_corrected.csv \
-    --output_dir ./byt5-ocr-correction-2 \
+    --dataset_path dataset/dataset.csv \
+    --output_dir ./byt5-ocr-correction \
     --num_epochs 4 \
     --batch_size 2 \
     --learning_rate 5e-4
@@ -190,16 +219,6 @@ python evaluate_model.py \
     --test_data dataset/test_split.csv
 ```
 
-## 🎯 Results
-
-### Performance Metrics
-
-| Model | CER (%) | BLEU | Edit Distance |
-|-------|---------|------|---------------|
-| Raw OCR (TrOCR) | 12.3 | 0.78 | 156.2 |
-| **Our Pipeline** | **7.1** | **0.89** | **89.4** |
-| Improvement | **↓42.3%** | **↑14.1%** | **↓42.7%** |
-
 ### Example Corrections
 
 | Original OCR | Corrected Text | Ground Truth |
@@ -229,77 +248,6 @@ medieval-ocr-correction/
 └── 📄 LICENSE                      # License file
 ```
 
-## 🔧 Configuration
-
-### Model Parameters
-
-You can customize the pipeline behavior by modifying parameters in the scripts:
-
-```python
-# OCR Model Configuration
-OCR_MODEL = "medieval-data/trocr-medieval-print"
-CORRECTION_MODEL = "./byt5-ocr-correction"
-
-# Processing Parameters
-MAX_LENGTH = 512
-BEAM_SIZE = 4
-BATCH_SIZE = 2
-```
-
-### Hardware Requirements
-
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| RAM | 8GB | 16GB+ |
-| GPU | GTX 1060 | RTX 3080+ |
-| Storage | 5GB | 10GB+ |
-
-## 📊 Benchmarking
-
-To reproduce our results:
-
-```bash
-# Run full evaluation
-python benchmark.py \
-    --dataset_path dataset/test_split.csv \
-    --output_dir results/
-
-# Generate performance charts
-python plot_results.py \
-    --results_dir results/ \
-    --output_dir figures/
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Submit a pull request
-
-## 📖 Citation
-
-If you use this work in your research, please cite our paper:
-
-```bibtex
-@article{your_name2024medieval,
-  title={Medieval OCR Text Correction using ByT5 and Kraken: A Complete Pipeline Approach},
-  author={Your Name and Co-authors},
-  journal={MDPI Electronics},
-  year={2024},
-  volume={XX},
-  number={XX},
-  pages={XXX-XXX},
-  doi={10.xxxx/electronics-xx-xxxxx}
-}
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🙏 Acknowledgments
 
 - **Kraken** OCR engine for line segmentation
@@ -309,11 +257,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-- **Author**: Your Name
-- **Email**: your.email@institution.edu
-- **Institution**: Your University/Organization
-- **Paper**: [Link to MDPI Electronics paper](your-paper-link)
-
----
-
-⭐ **Star this repository** if you find it useful for your research!
+Feel free to contact me via [LinkedIn](https://www.linkedin.com/in/yahya-momtaz-601b34108/)
