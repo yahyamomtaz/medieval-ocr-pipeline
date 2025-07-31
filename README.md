@@ -92,7 +92,7 @@ Our dataset consists of **10,643 text line pairs** extracted from medieval manus
 | Column | Description | Example |
 |--------|-------------|---------|
 | `line_id` | Unique identifier | `0033_033_line_30` |
-| `image_path` | Path to line image | `/path/to/line.png` |
+| `image_path` | Path to image | `image.png` |
 | `text` | Ground truth text | `Ius dei occultaret. la terza ut tetatis fa` |
 | `ocr_prediction` | Raw OCR output | `Ius dei occultare. la terza un tẽtatis fa` |
 | `page_id` | Source page identifier | `0033_033` |
@@ -117,8 +117,8 @@ The early printed books used for OCR and post-correction tasks originate from th
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/medieval-ocr-correction.git
-cd medieval-ocr-correction
+git clone https://github.com/your-username/medieval-ocr-pipeline.git
+cd medieval-ocr-pipeline
 
 # Install dependencies
 pip install -r requirements.txt
@@ -129,9 +129,26 @@ pip install kraken
 
 ### Model Downloads
 
-The pipeline will automatically download required models:
-- **TrOCR Medieval**: `medieval-data/trocr-medieval-print`
-- **ByT5 Base**: `google/byt5-small` (fine-tuned version included)
+The pipeline uses two pre-trained models:
+
+**🤖 Automatically Downloaded:**
+- **TrOCR Medieval**: `medieval-data/trocr-medieval-print` (downloaded on first run)
+
+**📥 Manual Download Required:**
+- **Fine-tuned ByT5 Correction Model**: Download from Dropbox
+
+#### Setup Instructions:
+1. **Download**: [ByT5 fine-tuned Model](https://www.dropbox.com/scl/fi/3kr1xf1jquqt3m01w6tos/byt5-ocr-correction.zip?rlkey=0jkk2byohcj4wwbddeenmz4zr&st=n83u7s9d&dl=0) (~1.2GB)
+2. **Extract**: Unzip to get the `byt5-ocr-correction/` folder  
+3. **Place**: Move folder to project root directory
+4. **Verify**: Ensure this structure:
+   ```
+   medieval-ocr-pipeline/
+   ├── byt5-ocr-correction/     # ← Your downloaded model
+   ├── complete_ocr_pipeline.py
+   └── requirements.txt
+   ```
+5. **Run**: `python complete_ocr_pipeline.py --image_path your_image.jpg`
 
 ## ⚡ Quick Start
 
@@ -141,7 +158,7 @@ Process a medieval manuscript image through the entire pipeline:
 
 ```bash
 python complete_ocr_pipeline.py \
-    --image_path dataset/images/manuscript.jpg \
+    --image_path manuscript.jpg \
     --output_file corrected_text.txt
 ```
 
@@ -201,23 +218,6 @@ python Byt5_finetune.py \
 | `--max_length` | 128 | Maximum sequence length |
 | `--warmup_steps` | 250 | Warmup steps for scheduler |
 
-## 📈 Evaluation
-
-### Metrics
-
-The system is evaluated using standard OCR metrics:
-
-- **Character Error Rate (CER)**: Character-level accuracy
-- **BLEU Score**: Sequence-level similarity
-- **Edit Distance**: Number of character edits required
-
-### Running Evaluation
-
-```bash
-python evaluate_model.py \
-    --model_path ./byt5-ocr-correction \
-    --test_data dataset/test_split.csv
-```
 
 ### Example Corrections
 
@@ -227,26 +227,6 @@ python evaluate_model.py \
 | `ti perlo peccato:cessi uolse esser tenta` | `ti per lo peccato: Cossi uolse esser tenta` | `ti per lo peccato: Cossi uolse esser tenta` |
 | `Uctus ẽ iesus in desertũ a sai` | `Vctus est iesus in desertum a spi` | `Vctus est iesus in desertum a spi` |
 
-## 📂 Repository Structure
-
-```
-medieval-ocr-correction/
-├── 📁 dataset/
-│   ├── images/                     # Input manuscript images
-│   ├── lines/                      # Segmented line images
-│   └── dataset_abbreviation_corrected.csv  # Training data
-├── 📁 models/
-│   └── byt5-ocr-correction/        # Fine-tuned ByT5 model
-├── 📁 utils/
-│   ├── segmentation_*.py           # Line segmentation utilities
-│   ├── dataset.py                  # Dataset processing
-│   └── evaluation.py               # Evaluation metrics
-├── 📄 complete_ocr_pipeline.py     # Main pipeline script
-├── 📄 Byt5_finetune.py            # Model training script
-├── 📄 requirements.txt             # Dependencies
-├── 📄 README.md                    # This file
-└── 📄 LICENSE                      # License file
-```
 
 ## 🙏 Acknowledgments
 
@@ -254,6 +234,12 @@ medieval-ocr-correction/
 - **TrOCR** team for the medieval manuscript model
 - **Google** for the ByT5 architecture
 - **MDPI Electronics** for publishing our research
+
+**Citation**: If you use this work in your research, please cite our paper:
+
+```bibtex
+
+```
 
 ## 📞 Contact
 
