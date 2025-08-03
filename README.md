@@ -239,6 +239,19 @@ python Byt5_finetune.py \
 
 ```bibtex
 
+@Article{electronics14153083,
+AUTHOR = {Momtaz, Yahya and Laccetti, Lorenza and Russo, Guido},
+TITLE = {Modular Pipeline for Text Recognition in Early Printed Books Using Kraken and ByT5},
+JOURNAL = {Electronics},
+VOLUME = {14},
+YEAR = {2025},
+NUMBER = {15},
+ARTICLE-NUMBER = {3083},
+URL = {https://www.mdpi.com/2079-9292/14/15/3083},
+ISSN = {2079-9292},
+DOI = {10.3390/electronics14153083}
+}
+
 ```
 
 ## 📞 Contact
