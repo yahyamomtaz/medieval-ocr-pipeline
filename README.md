@@ -7,7 +7,7 @@
 
 This repository contains the implementation of a complete OCR text correction pipeline specifically designed for medieval manuscripts. The system combines **Kraken** for line segmentation, **TrOCR** for initial text recognition, and a fine-tuned **ByT5** model for OCR error correction.
 
-## 🔍 Overview
+## Overview
 
 Medieval manuscripts present unique challenges for OCR systems due to:
 - **Historical writing styles** and letterforms
@@ -17,7 +17,7 @@ Medieval manuscripts present unique challenges for OCR systems due to:
 
 Our solution addresses these challenges through a multi-stage pipeline that achieves significant improvements in text recognition accuracy.
 
-## 🏗️ Pipeline Architecture
+## Pipeline Architecture
 
 ```mermaid
 graph TB
@@ -85,7 +85,7 @@ graph TB
 4. **Text Assembly**: Individual corrected lines are combined into final output
 
 
-## 📊 Dataset
+## Dataset
 
 Our dataset consists of **10,643 text line pairs** extracted from medieval manuscripts:
 
@@ -106,18 +106,19 @@ Our dataset consists of **10,643 text line pairs** extracted from medieval manus
 
 The early printed books used for OCR and post-correction tasks originate from the [MAGIC digital archive](https://www.magic.unina.it), which provides open access to digitized manuscripts. Our training data was created by aligning OCR outputs with manually verified transcriptions based on these sources.
 
-## 🚀 Installation
+## Installation
 
-### Requirements
-- Python 3.8+
-- CUDA-capable GPU (recommended)
-- 16GB+ RAM
+### Python Version
+
+**Required: Python 3.9 - 3.12**
+
+**Important**: Python 3.13 is NOT compatible due to Kraken dependencies. Use Python 3.12 for best compatibility.
 
 ### Dependencies
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/medieval-ocr-pipeline.git
+git clone https://github.com/yahyamomtaz/medieval-ocr-pipeline.git
 cd medieval-ocr-pipeline
 
 # Install dependencies
@@ -129,26 +130,21 @@ pip install kraken
 
 ### Model Downloads
 
-The pipeline uses two pre-trained models:
+The pipeline uses two pre-trained models that are **automatically downloaded** on first run:
 
-**🤖 Automatically Downloaded:**
-- **TrOCR Medieval**: `medieval-data/trocr-medieval-print` (downloaded on first run)
+**🤖 Models (Auto-downloaded from HuggingFace):**
+- **TrOCR Medieval**: [`medieval-data/trocr-medieval-print`](https://huggingface.co/medieval-data/trocr-medieval-print)
+- **Fine-tuned ByT5 Correction**: [`yayamomt/byt5-medieval-ocr-correction`](https://huggingface.co/yayamomt/byt5-medieval-ocr-correction)
 
-**📥 Manual Download Required:**
-- **Fine-tuned ByT5 Correction Model**: Download from Dropbox
+#### No Manual Setup Required!
 
-#### Setup Instructions:
-1. **Download**: [ByT5 fine-tuned Model](https://www.dropbox.com/scl/fi/3kr1xf1jquqt3m01w6tos/byt5-ocr-correction.zip?rlkey=0jkk2byohcj4wwbddeenmz4zr&st=n83u7s9d&dl=0) (~1.2GB)
-2. **Extract**: Unzip to get the `byt5-ocr-correction/` folder  
-3. **Place**: Move folder to project root directory
-4. **Verify**: Ensure this structure:
-   ```
-   medieval-ocr-pipeline/
-   ├── byt5-ocr-correction/     # ← Your downloaded model
-   ├── complete_ocr_pipeline.py
-   └── requirements.txt
-   ```
-5. **Run**: `python complete_ocr_pipeline.py --image_path your_image.jpg`
+The pipeline automatically downloads both models from HuggingFace Hub on first run. Simply install dependencies and run:
+
+```bash
+python complete_ocr_pipeline.py --image_path your_image.jpg
+```
+
+The models will be cached locally for future use (~1.5GB total download).
 
 ## ⚡ Quick Start
 
@@ -182,7 +178,7 @@ print(f"Processed {len(line_results)} lines")
 print(f"Final text: {final_text[:100]}...")
 ```
 
-## 🎯 Training
+## Training
 
 ### Dataset Preparation
 
@@ -218,7 +214,6 @@ python Byt5_finetune.py \
 | `--max_length` | 128 | Maximum sequence length |
 | `--warmup_steps` | 250 | Warmup steps for scheduler |
 
-
 ### Example Corrections
 
 | Original OCR | Corrected Text | Ground Truth |
@@ -228,7 +223,7 @@ python Byt5_finetune.py \
 | `Uctus ẽ iesus in desertũ a sai` | `Vctus est iesus in desertum a spi` | `Vctus est iesus in desertum a spi` |
 
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Kraken** OCR engine for line segmentation
 - **TrOCR** team for the medieval manuscript model
@@ -254,6 +249,6 @@ DOI = {10.3390/electronics14153083}
 
 ```
 
-## 📞 Contact
+## Contact
 
 Feel free to contact me via [LinkedIn](https://www.linkedin.com/in/yahya-momtaz-601b34108/)

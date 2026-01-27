@@ -9,18 +9,18 @@ A complete pipeline for processing medieval manuscript images through:
 3. ByT5-based OCR error correction
 
 This implementation supports the research published in:
-"Medieval OCR Text Correction using ByT5 and Kraken: A Complete Pipeline Approach"
-MDPI Electronics Journal, 2024
+"Modular Pipeline for Text Recognition in Early Printed Books Using Kraken and ByT5"
+Electronics 2025, 14(15), 3083; https://doi.org/10.3390/electronics14153083
 
-Authors: [Your Name], [Co-authors]
-Institution: [Your Institution]
-Email: [your.email@institution.edu]
+Authors: Yahya Momtaz, Lorenza Laccetti and Guido Russo
+Institution: University of Naples Federico II
+Email: yahya.momtaz@unina.it
 
 Usage:
     python complete_ocr_pipeline.py --image_path dataset/images/manuscript.jpg
     
 Requirements:
-    - Python 3.8+
+    - Python 3.12
     - CUDA-capable GPU (recommended)
     - Kraken OCR engine
     - Fine-tuned ByT5 correction model
@@ -53,7 +53,6 @@ logger = logging.getLogger(__name__)
 
 # Model configuration constants
 DEFAULT_OCR_MODEL = "medieval-data/trocr-medieval-print"
-DEFAULT_CORRECTION_MODEL_PATHS = ["./byt5-ocr-correction", "./t5_ocr_correction"]
 MAX_SEQUENCE_LENGTH = 512
 GENERATION_BEAM_SIZE = 4
 DEVICE_AUTO = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -94,23 +93,10 @@ def setup_models(device: str = DEVICE_AUTO) -> Tuple[Any, Any, Any, Any, str]:
         
         # Load fine-tuned ByT5 correction model
         logger.info("Loading fine-tuned ByT5 correction model...")
-        correction_model_path = None
-        
-        # Try multiple possible model paths
-        for path in DEFAULT_CORRECTION_MODEL_PATHS:
-            if os.path.exists(path):
-                correction_model_path = path
-                break
-                
-        if correction_model_path is None:
-            raise FileNotFoundError(
-                f"Correction model not found in any of: {DEFAULT_CORRECTION_MODEL_PATHS}"
-            )
-        
-        tokenizer = AutoTokenizer.from_pretrained(correction_model_path)
-        correction_model = T5ForConditionalGeneration.from_pretrained(correction_model_path)
+        correction_model = T5ForConditionalGeneration.from_pretrained("yayamomt/byt5-medieval-ocr-correction")
+        tokenizer = AutoTokenizer.from_pretrained("yayamomt/byt5-medieval-ocr-correction")
         correction_model.to(device)
-        logger.info(f"✓ ByT5 correction model loaded: {correction_model_path}")
+        logger.info(f"✓ ByT5 correction model loaded: yayamomt/byt5-medieval-ocr-correction")
         
         return processor, ocr_model, tokenizer, correction_model, device
         
