@@ -485,7 +485,7 @@ def save_results(
             f.write("=" * 50 + "\n\n")
             f.write(f"Source Image: {image_path}\n")
             f.write(f"Total Lines: {len(all_results)}\n")
-            f.write(f"Processing Date: {torch.cuda.get_device_name() if torch.cuda.is_available() else 'CPU'}\n\n")
+            f.write(f"Processing Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}\n\n")
             
             for result in all_results:
                 f.write(f"Line {result['line_number']}:\n")
