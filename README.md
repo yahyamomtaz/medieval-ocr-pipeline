@@ -201,7 +201,7 @@ python Byt5_finetune.py \
     --output_dir ./byt5-ocr-correction \
     --num_epochs 4 \
     --batch_size 2 \
-    --learning_rate 5e-4
+    --learning_rate 5e-5
 ```
 
 ### Training Parameters
@@ -210,7 +210,7 @@ python Byt5_finetune.py \
 |-----------|---------|-------------|
 | `--num_epochs` | 4 | Number of training epochs |
 | `--batch_size` | 2 | Training batch size |
-| `--learning_rate` | 5e-4 | Learning rate |
+| `--learning_rate` | 5e-5 | Learning rate |
 | `--max_length` | 128 | Maximum sequence length |
 | `--warmup_steps` | 250 | Warmup steps for scheduler |
 
