@@ -104,6 +104,7 @@ Our dataset consists of **10,643 text line pairs** extracted from medieval manus
 - **Character Error Rate** (before correction): ~12.3%
 - **Training/Validation/Test split**: 80%/10%/10%
 
+Note: the 12.3% baseline CER reflects the TrOCR medieval model before ByT5 correction. The paper reports ~38% using Kraken's default model as the OCR baseline.
 The early printed books used for OCR and post-correction tasks originate from the [MAGIC digital archive](https://www.magic.unina.it), which provides open access to digitized manuscripts. Our training data was created by aligning OCR outputs with manually verified transcriptions based on these sources.
 
 ## Installation
